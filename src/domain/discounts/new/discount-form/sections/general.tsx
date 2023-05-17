@@ -5,7 +5,7 @@ import { Controller, useWatch } from "react-hook-form"
 import Checkbox from "../../../../../components/atoms/checkbox"
 import IconTooltip from "../../../../../components/molecules/icon-tooltip"
 import InputField from "../../../../../components/molecules/input"
-import Select from "../../../../../components/molecules/select"
+import { NextSelect } from "../../../../../components/molecules/select/next-select"
 import TextArea from "../../../../../components/molecules/textarea"
 import CurrencyInput from "../../../../../components/organisms/currency-input"
 import { useDiscountForm } from "../form/discount-form-context"
@@ -21,7 +21,7 @@ const General: React.FC<GeneralProps> = ({ discount }) => {
     string | undefined
   >(initialCurrency)
 
-  const { regions: opts } = useAdminRegions()
+  const { regions: opts, isLoading } = useAdminRegions()
   const { register, control, type } = useDiscountForm()
 
   const regions = useWatch({
@@ -36,7 +36,7 @@ const General: React.FC<GeneralProps> = ({ discount }) => {
       if (Array.isArray(regions) && regions.length) {
         id = regions[0].value
       } else {
-        id = ((regions as unknown) as { label: string; value: string }).value // if you change from fixed to percentage, unselect and select a region, and then change back to fixed it is possible to make useForm set regions to an object instead of an array
+        id = (regions as unknown as { label: string; value: string }).value // if you change from fixed to percentage, unselect and select a region, and then change back to fixed it is possible to make useForm set regions to an object instead of an array
       }
 
       const reg = opts?.find((r) => r.id === id)
@@ -51,34 +51,29 @@ const General: React.FC<GeneralProps> = ({ discount }) => {
     return opts?.map((r) => ({ value: r.id, label: r.name })) || []
   }, [opts])
 
-  const [render, setRender] = useState(false)
-  useEffect(() => {
-    setTimeout(() => setRender(true), 100)
-  }, [])
-
   return (
     <div className="pt-5">
-      {render && (
+      {!isLoading && (
         <>
           <Controller
             name="regions"
             control={control}
             rules={{
-              required: "Atleast one region is required",
+              required: "At least one region is required",
               validate: (value) =>
                 Array.isArray(value) ? value.length > 0 : !!value,
             }}
             render={({ field: { onChange, value } }) => {
               return (
-                <Select
+                <NextSelect
                   value={value || null}
                   onChange={(value) => {
                     onChange(type === "fixed" ? [value] : value)
                   }}
                   label="Choose valid regions"
-                  isMultiSelect={type !== "fixed"}
-                  hasSelectAll={type !== "fixed"}
-                  enableSearch
+                  isMulti={type !== "fixed"}
+                  selectAll={type !== "fixed"}
+                  isSearchable
                   required
                   options={regionOptions}
                 />

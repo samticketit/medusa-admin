@@ -1,26 +1,15 @@
 import { AdminAnalyticsConfigRes } from "@medusajs/medusa"
 import { AnalyticsBrowser } from "@segment/analytics-next"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import axios from "axios"
-import { useMutation, useQuery, useQueryClient } from "react-query"
 import { WRITE_KEY } from "../components/constants/analytics"
 import { useFeatureFlag } from "../context/feature-flag"
-
-let baseURL = "http://localhost:9000"
-
-// deprecated
-if (process.env.GATSBY_STORE_URL) {
-  baseURL = process.env.GATSBY_STORE_URL
-}
-
-// takes precedence over GATSBY_STORE_URL
-if (process.env.GATSBY_MEDUSA_BACKEND_URL) {
-  baseURL = process.env.GATSBY_MEDUSA_BACKEND_URL
-}
+import { medusaUrl } from "./config"
 
 // API
 
 const client = axios.create({
-  baseURL: `${baseURL}/admin/analytics-configs`,
+  baseURL: `${medusaUrl}/admin/analytics-configs`,
   withCredentials: true,
 })
 

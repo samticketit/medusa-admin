@@ -1,8 +1,7 @@
-import { ProductVariant } from "@medusajs/medusa"
+import { Product, ProductVariant, Region } from "@medusajs/medusa"
 import clsx from "clsx"
 import React, { useContext, useEffect, useState } from "react"
 import { Controller } from "react-hook-form"
-
 import Button from "../../../../components/fundamentals/button"
 import MinusIcon from "../../../../components/fundamentals/icons/minus-icon"
 import PlusIcon from "../../../../components/fundamentals/icons/plus-icon"
@@ -21,35 +20,46 @@ import {
 import RMASelectProductSubModal from "../../details/rma-sub-modals/products"
 import { useNewOrderForm } from "../form"
 import CustomItemSubModal from "./custom-item-sub-modal"
+import { useMedusa } from "medusa-react"
 
 const Items = () => {
-  const { enableNextPage, disableNextPage, nextStepEnabled } = React.useContext(
-    SteppedContext
-  )
+  const { enableNextPage, disableNextPage, nextStepEnabled } =
+    React.useContext(SteppedContext)
 
   const {
     context: { region, items },
-    form: { control, register, setValue, getValues },
+    form: { control, register, setValue },
   } = useNewOrderForm()
-  const { fields, append, remove } = items
+
+  const { client } = useMedusa()
+
+  const { fields, append, remove, update } = items
 
   const [editQuantity, setEditQuantity] = useState(-1)
   const [editPrice, setEditPrice] = useState(-1)
 
   const layeredContext = useContext(LayeredModalContext)
 
-  const addItem = (variants: ProductVariant[]) => {
+  const addItem = async (variants: ProductVariant[]) => {
     const ids = fields.map((field) => field.variant_id)
+
     const itemsToAdd = variants.filter((v) => !ids.includes(v.id))
 
+    const variantIds = itemsToAdd.map((v) => v.id)
+
+    const { variants: newVariants } = await client.admin.variants.list({
+      id: variantIds,
+      region_id: region?.id,
+    })
+
     append(
-      itemsToAdd.map((item) => ({
+      newVariants.map((item) => ({
         quantity: 1,
         variant_id: item.id,
-        title: item.title,
-        unit_price: extractUnitPrice(item, region, false),
-        product_title: item.product.title,
-        thumbnail: item.product.thumbnail,
+        title: item.title as string,
+        unit_price: extractUnitPrice(item, region as Region, false),
+        product_title: (item.product as Product)?.title,
+        thumbnail: (item.product as Product)?.thumbnail,
       }))
     )
 
@@ -59,11 +69,11 @@ const Items = () => {
   }
 
   const handleEditQuantity = (index: number, value: number) => {
-    const oldQuantity = getValues(`items.${index}.quantity`)
-    const newQuantity = +oldQuantity + value
+    const field = fields[index]
+    field.quantity = field.quantity + value
 
-    if (newQuantity > 0) {
-      setValue(`items.${index}.quantity`, newQuantity)
+    if (field.quantity > 0) {
+      update(index, field)
     }
   }
 

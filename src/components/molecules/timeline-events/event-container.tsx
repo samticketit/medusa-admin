@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import moment from "moment"
-import React, { useState } from "react"
+import React, { ReactNode, useState } from "react"
 import Tooltip from "../../atoms/tooltip"
 import BellOffIcon from "../../fundamentals/icons/bell-off-icon"
 import ChevronDownIcon from "../../fundamentals/icons/chevron-down"
@@ -14,7 +14,7 @@ export enum EventIconColor {
   DEFAULT = "text-grey-50",
 }
 
-type EventContainerProps = {
+export type EventContainerProps = {
   icon: React.ReactNode
   iconColor?: EventIconColor
   title: string
@@ -24,6 +24,7 @@ type EventContainerProps = {
   midNode?: React.ReactNode
   isFirst?: boolean
   expandable?: boolean
+  children: ReactNode
 }
 
 const EventContainer: React.FC<EventContainerProps> = ({
@@ -71,13 +72,13 @@ const EventContainer: React.FC<EventContainerProps> = ({
         </div>
       </div>
       <div className="flex gap-x-xsmall">
-        <div className="w-5 flex justify-center pt-base">
-          {!isFirst && <div className="w-px min-h-[24px]" />}
+        <div className="flex w-5 justify-center pt-base">
+          {!isFirst && <div className="min-h-[24px] w-px" />}
         </div>
-        <div className="mt-2xsmall w-full inter-small-regular">
+        <div className="inter-small-regular mt-2xsmall w-full">
           <div className="flex items-center">
             <Tooltip content={new Date(time).toUTCString()}>
-              <div className="text-grey-50 inter-small-regular">
+              <div className="inter-small-regular text-grey-50">
                 {moment(time).fromNow()}
               </div>
             </Tooltip>
@@ -98,7 +99,7 @@ const EventContainer: React.FC<EventContainerProps> = ({
 }
 
 const Dot = ({ size = "2px", bg = "bg-grey-50" }) => {
-  return <div className={`w-[2px] h-[2px] aspect-square ${bg} rounded-full`} />
+  return <div className={`aspect-square h-[2px] w-[2px] ${bg} rounded-full`} />
 }
 
 export default EventContainer

@@ -1,13 +1,12 @@
-import { navigate } from "gatsby"
 import { useAdminCreateDraftOrder } from "medusa-react"
 import React from "react"
+import { useNavigate } from "react-router-dom"
 import { LayeredModalContext } from "../../../components/molecules/modal/layered-modal"
 import SteppedModal, {
   SteppedContext,
 } from "../../../components/molecules/modal/stepped-modal"
 import useNotification from "../../../hooks/use-notification"
 import isNullishObject from "../../../utils/is-nullish-object"
-import { persistedPrice } from "../../../utils/prices"
 import Billing from "./components/billing-details"
 import Items from "./components/items"
 import SelectRegionScreen from "./components/select-region"
@@ -24,6 +23,7 @@ const NewOrder = ({ onDismiss }: NewOrderProps) => {
   const steppedContext = React.useContext(SteppedContext)
   const layeredContext = React.useContext(LayeredModalContext)
 
+  const navigate = useNavigate()
   const notification = useNotification()
   const { mutate } = useAdminCreateDraftOrder()
 
@@ -54,9 +54,10 @@ const NewOrder = ({ onDismiss }: NewOrderProps) => {
         shipping_methods: [
           {
             option_id: data.shipping_option.value,
-            price: data.custom_shipping_price
-              ? data.custom_shipping_price
-              : undefined,
+            price:
+              typeof data.custom_shipping_price === "number"
+                ? data.custom_shipping_price
+                : undefined,
           },
         ],
         shipping_address: data.shipping_address_id

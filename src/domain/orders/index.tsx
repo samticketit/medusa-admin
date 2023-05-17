@@ -1,7 +1,7 @@
-import { RouteComponentProps, Router } from "@reach/router"
-import { navigate } from "gatsby"
 import { useAdminCreateBatchJob } from "medusa-react"
-import React, { useContext, useMemo } from "react"
+import React, { useContext, useMemo, useState } from "react"
+import { Route, Routes, useNavigate } from "react-router-dom"
+
 import Button from "../../components/fundamentals/button"
 import ExportIcon from "../../components/fundamentals/icons/export-icon"
 import BodyCard from "../../components/organisms/body-card"
@@ -11,17 +11,22 @@ import OrderTable from "../../components/templates/order-table"
 import useNotification from "../../hooks/use-notification"
 import useToggleState from "../../hooks/use-toggle-state"
 import { getErrorMessage } from "../../utils/error-messages"
-import Details from "./details"
 import { PollingContext } from "../../context/polling"
+import Details from "./details"
+import { transformFiltersAsExportContext } from "./utils"
 
 const VIEWS = ["orders", "drafts"]
 
-const OrderIndex: React.FC<RouteComponentProps> = () => {
+const OrderIndex = () => {
   const view = "orders"
 
   const { resetInterval } = useContext(PollingContext)
+  const navigate = useNavigate()
   const createBatchJob = useAdminCreateBatchJob()
   const notification = useNotification()
+
+  const [contextFilters, setContextFilters] =
+    useState<Record<string, { filter: string[] }>>()
 
   const {
     open: openExportModal,
@@ -44,9 +49,11 @@ const OrderIndex: React.FC<RouteComponentProps> = () => {
 
   const handleCreateExport = () => {
     const reqObj = {
-      type: "order-export",
-      context: {},
       dry_run: false,
+      type: "order-export",
+      context: contextFilters
+        ? transformFiltersAsExportContext(contextFilters)
+        : {},
     }
 
     createBatchJob.mutate(reqObj, {
@@ -78,9 +85,10 @@ const OrderIndex: React.FC<RouteComponentProps> = () => {
                 activeView={view}
               />
             }
+            className="h-fit"
             customActionable={actions}
           >
-            <OrderTable />
+            <OrderTable setContextFilters={setContextFilters} />
           </BodyCard>
         </div>
       </div>
@@ -98,10 +106,10 @@ const OrderIndex: React.FC<RouteComponentProps> = () => {
 
 const Orders = () => {
   return (
-    <Router>
-      <OrderIndex path="/" />
-      <Details path=":id" />
-    </Router>
+    <Routes>
+      <Route index element={<OrderIndex />} />
+      <Route path="/:id" element={<Details />} />
+    </Routes>
   )
 }
 

@@ -231,12 +231,20 @@ const RMASelectProductSubModal: React.FC<RMASelectProductSubModalProps> = ({
             immediateSearchFocus
             enableSearch
             searchPlaceholder="Search Products.."
+            searchValue={query}
             handleSearch={handleSearch}
             {...getTableProps()}
           >
             <Table.Body {...getTableBodyProps()}>
               {isLoading ? (
-                <Spinner size="large" />
+                <Table.Row>
+                  <Table.Cell
+                    colSpan={columns.length}
+                    className="flex items-center justify-center"
+                  >
+                    <Spinner size="large" variant="secondary" />
+                  </Table.Cell>
+                </Table.Row>
               ) : (
                 rows.map((row, i) => {
                   prepareRow(row)

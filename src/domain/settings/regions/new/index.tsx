@@ -1,8 +1,8 @@
 import { AdminPostRegionsReq } from "@medusajs/medusa"
-import { navigate } from "gatsby"
 import { useAdminCreateRegion } from "medusa-react"
-import React, { useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 import Button from "../../../../components/fundamentals/button"
 import CrossIcon from "../../../../components/fundamentals/icons/cross-icon"
 import FocusModal from "../../../../components/molecules/modal/focus-modal"
@@ -30,28 +30,22 @@ type NewRegionFormType = {
 const NewRegion = ({ onClose }: Props) => {
   const [sections, setSections] = useState(["details"])
   const form = useForm<NewRegionFormType>({
-    defaultValues: {
-      details: {
-        countries: [],
-      },
-      providers: {
-        payment_providers: undefined,
-        fulfillment_providers: undefined,
-      },
-    },
+    defaultValues: getDefaultValues(),
   })
+
   const {
     formState: { isDirty },
     handleSubmit,
     reset,
   } = form
   const { mutate, isLoading } = useAdminCreateRegion()
+  const navigate = useNavigate()
   const notification = useNotification()
 
   const { isFeatureEnabled } = useFeatureFlag()
 
   const closeAndReset = () => {
-    reset()
+    reset(getDefaultValues())
     onClose()
   }
 
@@ -97,7 +91,7 @@ const NewRegion = ({ onClose }: Props) => {
     <form className="w-full" onSubmit={onSubmit} noValidate>
       <FocusModal>
         <FocusModal.Header>
-          <div className="medium:w-8/12 w-full px-8 flex justify-between">
+          <div className="flex w-full justify-between px-8 medium:w-8/12">
             <Button
               size="small"
               variant="ghost"
@@ -106,7 +100,7 @@ const NewRegion = ({ onClose }: Props) => {
             >
               <CrossIcon size={20} />
             </Button>
-            <div className="gap-x-small flex">
+            <div className="flex gap-x-small">
               <Button
                 size="small"
                 variant="primary"
@@ -119,8 +113,8 @@ const NewRegion = ({ onClose }: Props) => {
             </div>
           </div>
         </FocusModal.Header>
-        <FocusModal.Main className="w-full no-scrollbar flex justify-center">
-          <div className="medium:w-7/12 large:w-6/12 small:w-4/5 max-w-[700px] my-16">
+        <FocusModal.Main className="no-scrollbar flex w-full justify-center">
+          <div className="my-16 max-w-[700px] small:w-4/5 medium:w-7/12 large:w-6/12">
             <Accordion
               value={sections}
               onValueChange={setSections}
@@ -132,7 +126,7 @@ const NewRegion = ({ onClose }: Props) => {
                 forceMountContent
                 required
               >
-                <p className="inter-base-regular text-grey-50 mb-xlarge">
+                <p className="inter-base-regular mb-xlarge text-grey-50">
                   Add the region details.
                 </p>
                 <RegionDetailsForm
@@ -146,7 +140,7 @@ const NewRegion = ({ onClose }: Props) => {
                 forceMountContent
                 required
               >
-                <p className="inter-base-regular text-grey-50 mb-xlarge">
+                <p className="inter-base-regular mb-xlarge text-grey-50">
                   Add which fulfillment and payment providers shoulb be
                   available in this region.
                 </p>
@@ -161,3 +155,15 @@ const NewRegion = ({ onClose }: Props) => {
 }
 
 export default NewRegion
+
+const getDefaultValues = () => {
+  return {
+    details: {
+      countries: [],
+    },
+    providers: {
+      payment_providers: undefined,
+      fulfillment_providers: undefined,
+    },
+  }
+}
