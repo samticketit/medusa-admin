@@ -94,8 +94,8 @@ function EditCustomersTable(props: EditCustomersTableProps) {
 
   const { customer_groups } = useAdminCustomerGroups({ expand: "customers" })
   const { customers = [], count = 0, isLoading } = useAdminCustomers({
-    ...queryObject,
-    groups: activeGroupId ? [activeGroupId] : null,
+    ...queryObject
+    // groups: activeGroupId ? [activeGroupId] : null,
   })
 
   useEffect(() => {
