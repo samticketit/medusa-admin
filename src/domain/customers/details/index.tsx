@@ -1,7 +1,7 @@
 import { useAdminCustomer } from "medusa-react"
 import moment from "moment"
 import { useState } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import Avatar from "../../../components/atoms/avatar"
 import Spinner from "../../../components/atoms/spinner"
 import EditIcon from "../../../components/fundamentals/icons/edit-icon"
@@ -19,7 +19,9 @@ import EditCustomerModal from "./edit"
 const CustomerDetail = () => {
   const { id } = useParams()
 
-  const { customer, isLoading } = useAdminCustomer(id!)
+  const { customer, isLoading } = useAdminCustomer(id!, {
+    expand: "groups,orders",
+  })
   const [showEdit, setShowEdit] = useState(false)
 
   const customerName = () => {
@@ -97,6 +99,26 @@ const CustomerDetail = () => {
                 variant={customer?.has_account ? "success" : "danger"}
                 title={customer?.has_account ? "True" : "False"}
               />
+            </div>
+          </div>
+          <div className="flex flex-col pl-6">
+            <div className="inter-smaller-regular text-grey-50 mb-1">
+              Groups
+            </div>
+            <div className="flex flex-col">
+              {customer?.groups?.length > 0 ? (
+                customer.groups.map((g) => (
+                  <Link
+                    to={`/a/customers/groups/${g.id}`}
+                    key={g.id}
+                    className="inter-small-regular text-violet-60 hover:underline"
+                  >
+                    {g.name}
+                  </Link>
+                ))
+              ) : (
+                <span className="inter-small-regular text-grey-90">N/A</span>
+              )}
             </div>
           </div>
         </div>
