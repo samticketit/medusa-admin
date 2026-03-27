@@ -14,7 +14,7 @@ import { useCustomerFilters } from "./use-customer-filters"
 const DEFAULT_PAGE_SIZE = 15
 
 const defaultQueryProps = {
-  expand: "orders",
+  expand: "orders,groups",
 }
 
 const CustomerTable = () => {

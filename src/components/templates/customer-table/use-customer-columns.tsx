@@ -2,6 +2,7 @@ import moment from "moment"
 import React, { useMemo } from "react"
 import { getColor } from "../../../utils/color"
 import CustomerAvatarItem from "../../molecules/customer-avatar-item"
+import CustomersGroupsSummary from "../../molecules/customers-groups-summary"
 
 export const useCustomerColumns = () => {
   const columns = useMemo(
@@ -24,6 +25,21 @@ export const useCustomerColumns = () => {
       {
         Header: "Email",
         accessor: "email",
+      },
+      {
+        Header: "Sign up Customer Number",
+        id: "sign_up_customer_number",
+        accessor: (row: { metadata?: Record<string, unknown> }) =>
+          row.metadata?.sign_up_customer_number as string | undefined,
+        Cell: ({ cell: { value } }: { cell: { value?: string | null } }) =>
+          value != null && String(value).trim() !== "" ? String(value) : "—",
+      },
+      {
+        Header: "Groups",
+        accessor: "groups",
+        Cell: ({ cell: { value } }) => (
+          <CustomersGroupsSummary groups={value || []} withLinks />
+        ),
       },
       {
         Header: "",

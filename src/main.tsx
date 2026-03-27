@@ -4,6 +4,7 @@ import React from "react"
 import { createRoot } from "react-dom/client"
 import App from "./App"
 import "./assets/styles/global.css"
+import MedusaAdminAuthShim from "./components/medusa-admin-auth-shim"
 import { LayeredModalProvider } from "./components/molecules/modal/layered-modal"
 import { SteppedProvider } from "./components/molecules/modal/stepped-modal"
 import { FeatureFlagProvider } from "./context/feature-flag"
@@ -18,6 +19,7 @@ const Page = ({ children }: PropsWithChildren) => {
         client: queryClient,
       }}
     >
+      <MedusaAdminAuthShim />
       <FeatureFlagProvider>
         <SteppedProvider>
           <LayeredModalProvider>{children}</LayeredModalProvider>
