@@ -51,6 +51,9 @@ export default {
       const path = `/admin/auth`
       return medusaRequest("GET", path)
     },
+    getSession() {
+      return this.session()
+    },
     authenticate(details) {
       const path = `/admin/auth`
       return medusaRequest("POST", path, details)
